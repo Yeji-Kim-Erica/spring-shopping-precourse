@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -26,6 +27,7 @@ import shopping.product.persistence.ProductRepository;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@DisplayName("상품 수정 API")
 class ProductUpdateApiTest {
 
     private static final String BODY =
@@ -46,6 +48,7 @@ class ProductUpdateApiTest {
                 .id();
     }
 
+    @DisplayName("상품 수정에 성공하면 모든 변경 내용을 저장하고 반환한다")
     @Test
     void updatesAndPersistsAllFields() throws Exception {
         update(id, BODY).andExpect(status().isOk())
@@ -60,6 +63,7 @@ class ProductUpdateApiTest {
         assertThat(stored.imageUrl()).isEqualTo("https://b.com");
     }
 
+    @DisplayName("수정 요청의 필수 값이 누락되면 저장된 상품 정보를 유지한다")
     @Test
     void missingFieldsLeaveStoredProductUnchanged() throws Exception {
         update(id, "{}").andExpect(status().isBadRequest())
@@ -68,6 +72,7 @@ class ProductUpdateApiTest {
         assertUnchanged();
     }
 
+    @DisplayName("수정 요청에 비속어가 있으면 저장된 상품 정보를 유지한다")
     @Test
     void profanityLeavesStoredProductUnchanged() throws Exception {
         when(checker.containsProfanity(anyString())).thenReturn(true);
@@ -78,6 +83,7 @@ class ProductUpdateApiTest {
         assertUnchanged();
     }
 
+    @DisplayName("수정 요청의 비속어 검사에 실패하면 저장된 상품 정보를 유지한다")
     @Test
     void unavailableCheckLeavesStoredProductUnchanged() throws Exception {
         when(checker.containsProfanity(anyString()))
@@ -89,6 +95,7 @@ class ProductUpdateApiTest {
         assertUnchanged();
     }
 
+    @DisplayName("존재하지 않는 상품을 요청하면 상품 없음 오류를 반환한다")
     @Test
     void missingProductReturnsNotFound() throws Exception {
         update(999999L, BODY).andExpect(status().isNotFound())

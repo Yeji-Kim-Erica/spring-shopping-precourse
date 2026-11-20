@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -26,6 +27,7 @@ import shopping.product.domain.ProfanityChecker;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@DisplayName("상품 추가 API")
 class ProductCreationApiTest {
 
     private static final String BODY = "{\"name\":\"상품\",\"price\":1000,"
@@ -43,6 +45,7 @@ class ProductCreationApiTest {
         jdbc.update("delete from products");
     }
 
+    @DisplayName("상품 추가에 성공하면 저장된 상품 정보와 생성 상태를 반환한다")
     @Test
     void storesProductAndReturnsCreatedDetails() throws Exception {
         create(BODY).andExpect(status().isCreated()).andExpect(jsonPath("$.id").isNumber())
@@ -54,6 +57,7 @@ class ProductCreationApiTest {
                 .isEqualTo(1);
     }
 
+    @DisplayName("잘못된 가격으로 상품 추가를 요청하면 저장하지 않는다")
     @ParameterizedTest
     @ValueSource(strings = {"0", "1.5", "2147483648", "\"1000\"", "null"})
     void invalidPriceDoesNotStoreProduct(String price) throws Exception {
@@ -63,6 +67,7 @@ class ProductCreationApiTest {
         assertEmpty();
     }
 
+    @DisplayName("비속어가 있는 상품 추가 요청은 저장 없이 입력 오류로 응답한다")
     @Test
     void profanityIsInputFailureWithoutStorage() throws Exception {
         when(checker.containsProfanity(anyString())).thenReturn(true);
@@ -73,6 +78,7 @@ class ProductCreationApiTest {
         assertEmpty();
     }
 
+    @DisplayName("비속어 검사 장애 시 저장 없이 서비스 이용 불가로 응답한다")
     @Test
     void checkerFailureReturnsServiceUnavailableWithoutStorage() throws Exception {
         when(checker.containsProfanity(anyString()))

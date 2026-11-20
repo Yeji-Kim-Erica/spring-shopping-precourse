@@ -9,12 +9,15 @@ import static org.mockito.Mockito.when;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneOffset;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import shopping.auth.domain.AccessToken;
 import shopping.auth.persistence.TokenRepository;
 
+@DisplayName("인증 토큰 발급")
 class TokenIssuerTest {
 
+    @DisplayName("생성한 토큰에 회원과 현재 발급 시각을 연결해 저장한다")
     @Test
     void persistsGeneratedTokenUsingCurrentTime() {
         TokenRepository repository = mock(TokenRepository.class);

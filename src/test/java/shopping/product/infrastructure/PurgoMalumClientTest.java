@@ -14,6 +14,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -21,6 +22,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import shopping.common.error.ErrorCode;
 import shopping.common.error.ShoppingException;
 
+@DisplayName("비속어 검사 API 클라이언트")
 class PurgoMalumClientTest {
 
     private HttpServer server;
@@ -49,6 +51,7 @@ class PurgoMalumClientTest {
         workers.shutdownNow();
     }
 
+    @DisplayName("비속어 API의 참과 거짓 응답을 해석한다")
     @ParameterizedTest
     @CsvSource({"true,true", "false,false"})
     void readsBooleanResponse(String body, boolean expected) {
@@ -57,6 +60,7 @@ class PurgoMalumClientTest {
         assertThat(client.containsProfanity("상품")).isEqualTo(expected);
     }
 
+    @DisplayName("특수 문자가 있는 상품 이름을 하나의 쿼리 파라미터로 전달한다")
     @Test
     void encodesNameAsSingleParameter() {
         client.containsProfanity("상품 A+B&/");
@@ -65,6 +69,7 @@ class PurgoMalumClientTest {
         assertThat(query).doesNotContain("&");
     }
 
+    @DisplayName("비속어 API의 HTTP 오류나 해석할 수 없는 응답은 검사 실패로 처리한다")
     @ParameterizedTest
     @CsvSource({"500,false", "200,unknown"})
     void rejectsHttpErrorsOrUnreadableBody(int code, String body) {
@@ -74,6 +79,7 @@ class PurgoMalumClientTest {
         assertUnavailable();
     }
 
+    @DisplayName("비속어 응답의 헤더와 본문 수신에 시간 제한을 적용한다")
     @ParameterizedTest
     @ValueSource(booleans = {false, true})
     void limitsHeaderAndBodyReception(boolean sendHeadersFirst) {

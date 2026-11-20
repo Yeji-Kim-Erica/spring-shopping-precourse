@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +21,7 @@ import shopping.product.persistence.ProductRepository;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Transactional
+@DisplayName("상품 목록 조회 API")
 class ProductListApiTest {
 
     @Autowired
@@ -32,6 +34,7 @@ class ProductListApiTest {
         products.deleteAll();
     }
 
+    @DisplayName("상품 목록을 상품 ID 오름차순으로 반환한다")
     @Test
     void returnsProductsInIdOrder() throws Exception {
         Product first = products.saveAndFlush(product("첫째"));
@@ -43,12 +46,14 @@ class ProductListApiTest {
                 .andExpect(jsonPath("$[1].id").value(second.id()));
     }
 
+    @DisplayName("등록된 상품이 없으면 빈 배열을 반환한다")
     @Test
     void returnsEmptyArrayWhenNoProductsExist() throws Exception {
         mvc.perform(get("/api/products")).andExpect(status().isOk())
                 .andExpect(jsonPath("$").isEmpty());
     }
 
+    @DisplayName("지원하지 않는 응답 형식 요청에는 JSON 오류를 반환한다")
     @Test
     void unsupportedResponseFormatUsesJsonError() throws Exception {
         mvc.perform(get("/api/products").accept("text/plain"))

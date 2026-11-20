@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import shopping.common.error.ErrorCode;
 import shopping.common.error.ShoppingException;
@@ -18,12 +19,14 @@ import shopping.product.persistence.ProductRepository;
 import shopping.wish.domain.Wish;
 import shopping.wish.persistence.WishRepository;
 
+@DisplayName("위시 추가 서비스")
 class WishAdditionServiceTest {
 
     private final WishRepository wishes = mock(WishRepository.class);
     private final ProductRepository products = mock(ProductRepository.class);
     private final WishAdditionService service = new WishAdditionService(wishes, products);
 
+    @DisplayName("회원별 중복 여부를 확인한 뒤 존재하는 상품을 위시에 추가한다")
     @Test
     void addsExistingProductAfterMemberScopedDuplicateCheck() {
         when(products.findById(9L)).thenReturn(Optional.of(mock(Product.class)));
@@ -34,6 +37,7 @@ class WishAdditionServiceTest {
         verify(wishes).existsByMemberIdAndProduct_Id(7L, 9L);
     }
 
+    @DisplayName("추가할 상품이 없으면 위시 저장소에 접근하지 않는다")
     @Test
     void missingProductDoesNotAccessWishlist() {
         when(products.findById(9L)).thenReturn(Optional.empty());
@@ -42,6 +46,7 @@ class WishAdditionServiceTest {
         verifyNoInteractions(wishes);
     }
 
+    @DisplayName("회원이 이미 담은 상품은 위시에 다시 저장하지 않는다")
     @Test
     void duplicateWishDoesNotSave() {
         when(products.findById(9L)).thenReturn(Optional.of(mock(Product.class)));

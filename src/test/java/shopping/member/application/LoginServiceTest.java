@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 
 import java.time.Instant;
 import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import shopping.auth.application.TokenIssuer;
 import shopping.auth.domain.AccessToken;
@@ -20,6 +21,7 @@ import shopping.member.domain.Member;
 import shopping.member.domain.Password;
 import shopping.member.persistence.MemberRepository;
 
+@DisplayName("로그인 서비스")
 class LoginServiceTest {
 
     private final MemberRepository members = mock(MemberRepository.class);
@@ -27,6 +29,7 @@ class LoginServiceTest {
     private final LoginService service = new LoginService(members, tokens);
     private final Email email = new Email("yeji@example.com");
 
+    @DisplayName("회원의 비밀번호 인증에 성공하면 토큰을 발급한다")
     @Test
     void issuesTokenAfterMemberAuthentication() {
         Member member = mock(Member.class);
@@ -39,6 +42,7 @@ class LoginServiceTest {
         verify(member).authenticate(argThat(value -> value.matches(new Password("hello123"))));
     }
 
+    @DisplayName("미가입 이메일로 로그인하면 토큰을 발급하지 않는다")
     @Test
     void missingMemberDoesNotIssueToken() {
         when(members.findByEmail(email)).thenReturn(Optional.empty());
@@ -47,6 +51,7 @@ class LoginServiceTest {
         verifyNoInteractions(tokens);
     }
 
+    @DisplayName("비밀번호가 다르면 토큰을 발급하지 않는다")
     @Test
     void incorrectPasswordDoesNotIssueToken() {
         Member member = new Member(email, new Password("different"));

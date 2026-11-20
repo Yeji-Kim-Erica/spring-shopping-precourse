@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +21,7 @@ import shopping.product.persistence.ProductRepository;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@DisplayName("상품 삭제 API")
 class ProductDeletionApiTest {
 
     @Autowired
@@ -32,6 +34,7 @@ class ProductDeletionApiTest {
         products.deleteAll();
     }
 
+    @DisplayName("요청한 상품만 삭제하고 본문 없는 성공 응답을 반환한다")
     @Test
     void removesOnlyRequestedProductAndReturnsNoContent() throws Exception {
         Product target = products.saveAndFlush(product("대상"));
@@ -43,6 +46,7 @@ class ProductDeletionApiTest {
         assertThat(products.findAll()).extracting(Product::id).containsExactly(other.id());
     }
 
+    @DisplayName("존재하지 않는 상품을 요청하면 상품 없음 오류를 반환한다")
     @Test
     void missingProductReturnsNotFound() throws Exception {
         mvc.perform(delete("/api/products/999999")).andExpect(status().isNotFound())

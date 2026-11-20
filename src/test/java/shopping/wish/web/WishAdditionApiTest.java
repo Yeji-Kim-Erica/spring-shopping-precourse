@@ -6,14 +6,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.web.servlet.ResultActions;
 
+@DisplayName("위시 추가 API")
 class WishAdditionApiTest extends WishApiSupport {
 
+    @DisplayName("인증된 회원의 위시에 상품을 추가한다")
     @Test
     void addsProductForAuthenticatedMember() throws Exception {
         add(owner).andExpect(status().isCreated()).andExpect(jsonPath("$.id").isNumber())
@@ -23,6 +26,7 @@ class WishAdditionApiTest extends WishApiSupport {
         assertThat(wishes.existsByMemberIdAndProduct_Id(otherId, product.id())).isFalse();
     }
 
+    @DisplayName("위시 중복 추가 여부는 인증된 회원을 기준으로 판단한다")
     @Test
     void duplicateCheckIsScopedToAuthenticatedMember() throws Exception {
         add(owner).andExpect(status().isCreated());
@@ -32,12 +36,14 @@ class WishAdditionApiTest extends WishApiSupport {
         add(other).andExpect(status().isCreated());
     }
 
+    @DisplayName("존재하지 않는 상품을 요청하면 상품 없음 오류를 반환한다")
     @Test
     void missingProductReturnsNotFound() throws Exception {
         request(owner, "{\"productId\":999999}").andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("PRODUCT_NOT_FOUND"));
     }
 
+    @DisplayName("위시 추가 시 상품 ID 누락이나 회원 직접 지정은 거절한다")
     @ParameterizedTest
     @ValueSource(strings = {"{}", "{\"productId\":1,\"memberId\":999}"})
     void rejectsMissingProductIdOrClientSuppliedMember(String body) throws Exception {
@@ -45,6 +51,7 @@ class WishAdditionApiTest extends WishApiSupport {
                 .andExpect(jsonPath("$.code").value("INVALID_REQUEST"));
     }
 
+    @DisplayName("위시 추가에는 유효한 인증 토큰이 필요하다")
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = {"Basic invalid", "Bearer unknown"})
@@ -57,6 +64,7 @@ class WishAdditionApiTest extends WishApiSupport {
         assertThat(wishes.count()).isZero();
     }
 
+    @DisplayName("만료된 토큰으로 위시에 상품을 추가할 수 없다")
     @Test
     void expiredTokenCannotAddWish() throws Exception {
         jdbc.update("update access_tokens set expires_at = "

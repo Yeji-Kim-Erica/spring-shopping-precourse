@@ -6,13 +6,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import shopping.product.domain.Product;
 import shopping.product.domain.ProductDetails;
 import shopping.wish.domain.Wish;
 
+@DisplayName("위시 삭제 API")
 class WishDeletionApiTest extends WishApiSupport {
 
+    @DisplayName("본인의 위시 중 요청한 항목만 삭제한다")
     @Test
     void deletesOnlyRequestedOwnWish() throws Exception {
         Wish target = wishes.saveAndFlush(new Wish(ownerId, product));
@@ -28,6 +31,7 @@ class WishDeletionApiTest extends WishApiSupport {
                 .containsExactlyInAnyOrder(others.id(), retained.id());
     }
 
+    @DisplayName("다른 회원의 위시 삭제 요청은 권한 오류로 응답한다")
     @Test
     void cannotDeleteAnotherMembersWish() throws Exception {
         Wish target = wishes.saveAndFlush(new Wish(ownerId, product));
@@ -38,6 +42,7 @@ class WishDeletionApiTest extends WishApiSupport {
         assertThat(wishes.existsById(target.id())).isTrue();
     }
 
+    @DisplayName("존재하지 않는 위시 삭제 요청은 위시 없음 오류로 응답한다")
     @Test
     void missingWishReturnsNotFound() throws Exception {
         mvc.perform(delete("/api/wishes/999999").header("Authorization", owner))
@@ -45,6 +50,7 @@ class WishDeletionApiTest extends WishApiSupport {
                 .andExpect(jsonPath("$.code").value("WISH_NOT_FOUND"));
     }
 
+    @DisplayName("인증되지 않은 위시 삭제 요청은 거절하고 항목을 유지한다")
     @Test
     void requiresAuthenticationBeforeDeleting() throws Exception {
         Wish target = wishes.saveAndFlush(new Wish(ownerId, product));

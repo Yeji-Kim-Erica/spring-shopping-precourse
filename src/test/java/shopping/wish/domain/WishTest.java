@@ -5,14 +5,17 @@ import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import shopping.common.error.ErrorCode;
 import shopping.common.error.ShoppingException;
 import shopping.product.domain.Product;
 import shopping.product.domain.ProductDetails;
 
+@DisplayName("위시 항목")
 class WishTest {
 
+    @DisplayName("위시 항목의 소유자만 삭제 권한 확인을 통과한다")
     @Test
     void onlyOwnerCanDeleteWish() {
         Product product = new Product(new ProductDetails("상품", 1000, "https://a.com"));
@@ -24,6 +27,7 @@ class WishTest {
                         error -> assertThat(error.code()).isEqualTo(ErrorCode.FORBIDDEN));
     }
 
+    @DisplayName("위시 생성에는 회원과 상품이 모두 필요하다")
     @Test
     void requiresMemberAndProductToCreateWish() {
         Product product = new Product(new ProductDetails("상품", 1000, "https://a.com"));

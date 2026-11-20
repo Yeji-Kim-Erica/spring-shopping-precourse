@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
@@ -22,6 +23,7 @@ import shopping.auth.application.AuthenticationService;
 @SpringBootTest
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
+@DisplayName("로그인 API")
 class LoginApiTest {
 
     @Autowired
@@ -38,6 +40,7 @@ class LoginApiTest {
         jdbc.update("delete from members");
     }
 
+    @DisplayName("로그인하면 새 토큰을 발급하고 기존 토큰도 유효하게 유지한다")
     @Test
     void loginIssuesNewTokenAndKeepsPreviousTokenValid() throws Exception {
         String original = token(request("register", "yeji@example.com", "hello123"));
@@ -49,6 +52,7 @@ class LoginApiTest {
                 .isEqualTo(authentication.authenticate(original));
     }
 
+    @DisplayName("미가입 이메일과 잘못된 비밀번호는 동일한 인증 오류를 반환한다")
     @ParameterizedTest
     @ValueSource(strings = {"missing@example.com", "yeji@example.com"})
     void missingEmailAndWrongPasswordReturnSameError(String email) throws Exception {
@@ -58,6 +62,7 @@ class LoginApiTest {
                 .andExpect(jsonPath("$.code").value("INVALID_CREDENTIALS"));
     }
 
+    @DisplayName("이메일과 비밀번호 형식 오류는 입력 오류로 응답한다")
     @Test
     void malformedCredentialsAreInputError() throws Exception {
         request("login", "bad", "hello123").andExpect(status().isBadRequest())

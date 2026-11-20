@@ -5,12 +5,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import shopping.wish.domain.Wish;
 import shopping.wish.persistence.WishRepository;
 
+@DisplayName("위시 조회 서비스")
 class WishQueryServiceTest {
 
+    @DisplayName("요청한 회원의 위시 목록을 조회한다")
     @Test
     void retrievesWishesForRequestedMember() {
         WishRepository wishes = mock(WishRepository.class);

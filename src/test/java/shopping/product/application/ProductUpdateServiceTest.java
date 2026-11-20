@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import shopping.common.error.ErrorCode;
 import shopping.common.error.ShoppingException;
@@ -16,6 +17,7 @@ import shopping.product.domain.ProductDetails;
 import shopping.product.domain.ProfanityChecker;
 import shopping.product.persistence.ProductRepository;
 
+@DisplayName("상품 수정 서비스")
 class ProductUpdateServiceTest {
 
     private final ProductRepository products = mock(ProductRepository.class);
@@ -29,12 +31,14 @@ class ProductUpdateServiceTest {
         when(products.findById(7L)).thenReturn(Optional.of(product));
     }
 
+    @DisplayName("검증을 통과하면 조회한 상품의 정보를 변경한다")
     @Test
     void changesLoadedProductAfterValidation() {
         assertThat(service.update(7L, updated)).isSameAs(product);
         assertThat(product.name()).isEqualTo("수정");
     }
 
+    @DisplayName("수정할 상품이 없으면 비속어 검사를 호출하지 않는다")
     @Test
     void missingProductDoesNotCallExternalChecker() {
         when(products.findById(7L)).thenReturn(Optional.empty());
@@ -43,6 +47,7 @@ class ProductUpdateServiceTest {
         verifyNoInteractions(checker);
     }
 
+    @DisplayName("수정할 이름에 비속어가 있으면 기존 상품 정보를 유지한다")
     @Test
     void profanityLeavesOriginalDetailsUntouched() {
         when(checker.containsProfanity("수정")).thenReturn(true);
@@ -51,6 +56,7 @@ class ProductUpdateServiceTest {
         assertUnchanged();
     }
 
+    @DisplayName("수정 시 비속어 검사에 실패하면 기존 상품 정보를 유지한다")
     @Test
     void unavailableCheckLeavesOriginalDetailsUntouched() {
         when(checker.containsProfanity("수정"))
