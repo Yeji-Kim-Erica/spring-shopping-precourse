@@ -12,23 +12,33 @@ import shopping.member.domain.Password;
 import shopping.member.persistence.MemberRepository;
 
 @Service
-public class RegistrationService {
+@Transactional
+public class MemberService {
 
     private final MemberRepository members;
     private final TokenIssuer tokens;
 
-    public RegistrationService(MemberRepository members, TokenIssuer tokens) {
+    public MemberService(MemberRepository members, TokenIssuer tokens) {
         this.members = members;
         this.tokens = tokens;
     }
 
-    @Transactional
     public AccessToken register(String email, String password) {
         Member member = new Member(new Email(email), new Password(password));
         rejectDuplicate(member.email());
 
         Member saved = members.saveAndFlush(member);
         return tokens.issue(saved.id());
+    }
+
+    public AccessToken login(String email, String password) {
+        Email address = new Email(email);
+        Password candidate = new Password(password);
+        Member member = members.findByEmail(address)
+                .orElseThrow(() -> new ShoppingException(ErrorCode.INVALID_CREDENTIALS));
+
+        member.authenticate(candidate);
+        return tokens.issue(member.id());
     }
 
     private void rejectDuplicate(Email email) {

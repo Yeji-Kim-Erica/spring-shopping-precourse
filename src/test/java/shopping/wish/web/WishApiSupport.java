@@ -7,7 +7,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import shopping.member.application.RegistrationService;
+import shopping.member.application.MemberService;
 import shopping.member.domain.Email;
 import shopping.member.persistence.MemberRepository;
 import shopping.product.domain.Product;
@@ -29,7 +29,7 @@ abstract class WishApiSupport {
     @Autowired
     protected ProductRepository products;
     @Autowired
-    private RegistrationService registration;
+    private MemberService registration;
     @Autowired
     private MemberRepository members;
     protected String owner;
