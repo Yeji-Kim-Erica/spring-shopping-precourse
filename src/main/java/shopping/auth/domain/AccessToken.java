@@ -6,6 +6,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.Duration;
 import java.time.Instant;
+import shopping.common.error.ErrorCode;
+import shopping.common.error.ShoppingException;
 
 @Entity
 @Table(name = "access_tokens")
@@ -36,6 +38,14 @@ public class AccessToken {
 
     public boolean isExpired(Instant now) {
         return !now.isBefore(expiresAt);
+    }
+
+    public Long authenticateAt(Instant now) {
+        if (isExpired(now)) {
+            throw new ShoppingException(ErrorCode.INVALID_TOKEN);
+        }
+
+        return memberId;
     }
 
     public String value() {

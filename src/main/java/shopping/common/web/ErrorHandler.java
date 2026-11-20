@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -57,7 +58,13 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     }
 
     private ResponseEntity<Object> respond(ErrorCode code) {
-        return ResponseEntity.status(ErrorStatus.of(code))
-                .contentType(MediaType.APPLICATION_JSON).body(ErrorResponse.of(code));
+        HttpStatus status = ErrorStatus.of(code);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        if (status == HttpStatus.UNAUTHORIZED) {
+            headers.set(HttpHeaders.WWW_AUTHENTICATE, "Bearer");
+        }
+
+        return new ResponseEntity<>(ErrorResponse.of(code), headers, status);
     }
 }
