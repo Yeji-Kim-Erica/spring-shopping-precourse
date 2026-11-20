@@ -184,3 +184,14 @@
 - 비속어 포함 시 `PROFANITY_DETECTED`를 반환한다.
 - 비속어 검사 실패 시 `PROFANITY_CHECK_UNAVAILABLE`을 반환한다.
 - 실패한 요청은 기존 상품 정보를 변경하지 않는다.
+
+### 상품 삭제
+
+- `DELETE /api/products/{productId}`
+- 토큰 인증 불필요
+- 성공: `204 No Content`, 응답 본문 없음.
+
+#### 실패 응답
+
+- 상품이 없으면 `PRODUCT_NOT_FOUND`를 반환한다.
+- 경로의 상품 ID가 정수가 아니면 `INVALID_REQUEST`를 반환한다.
