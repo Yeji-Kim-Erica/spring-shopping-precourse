@@ -37,6 +37,7 @@ class RegistrationApiTest {
 
     @BeforeEach
     void clear() {
+        jdbc.update("delete from wishes");
         jdbc.update("delete from access_tokens");
         jdbc.update("delete from members");
     }

@@ -34,11 +34,25 @@ public class ErrorHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<Object> handleConstraint(DataIntegrityViolationException error) {
         String message = String.valueOf(error.getMostSpecificCause().getMessage());
-        if (message.toLowerCase(Locale.ROOT).contains("uq_members_email")) {
-            return respond(ErrorCode.EMAIL_ALREADY_EXISTS);
+        ErrorCode code = constraintCode(message.toLowerCase(Locale.ROOT));
+        if (code == ErrorCode.INTERNAL_SERVER_ERROR) {
+            return handleUnexpected(error);
         }
 
-        return handleUnexpected(error);
+        return respond(code);
+    }
+
+    private ErrorCode constraintCode(String message) {
+        if (message.contains("uq_members_email")) {
+            return ErrorCode.EMAIL_ALREADY_EXISTS;
+        }
+        if (message.contains("uq_wishes_member_product")) {
+            return ErrorCode.WISH_ALREADY_EXISTS;
+        }
+        if (message.contains("fk_wishes_product")) {
+            return ErrorCode.PRODUCT_NOT_FOUND;
+        }
+        return ErrorCode.INTERNAL_SERVER_ERROR;
     }
 
     @ExceptionHandler(Exception.class)

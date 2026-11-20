@@ -11,6 +11,7 @@ final class ErrorStatus {
             Map.entry(ErrorCode.PROFANITY_CHECK_UNAVAILABLE, HttpStatus.SERVICE_UNAVAILABLE),
             Map.entry(ErrorCode.INVALID_CREDENTIALS, HttpStatus.UNAUTHORIZED),
             Map.entry(ErrorCode.PRODUCT_NOT_FOUND, HttpStatus.NOT_FOUND),
+            Map.entry(ErrorCode.WISH_ALREADY_EXISTS, HttpStatus.CONFLICT),
             Map.entry(ErrorCode.INVALID_TOKEN, HttpStatus.UNAUTHORIZED),
             Map.entry(ErrorCode.INVALID_REQUEST, HttpStatus.BAD_REQUEST),
             Map.entry(ErrorCode.EMAIL_ALREADY_EXISTS, HttpStatus.CONFLICT));

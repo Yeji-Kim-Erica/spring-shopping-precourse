@@ -32,6 +32,7 @@
 | `METHOD_NOT_ALLOWED` | 405 | 지원하지 않는 HTTP 메서드 |
 | `NOT_ACCEPTABLE` | 406 | 지원하지 않는 응답 형식 |
 | `EMAIL_ALREADY_EXISTS` | 409 | 이미 가입된 이메일 |
+| `WISH_ALREADY_EXISTS` | 409 | 본인의 위시리스트에 이미 등록된 상품 |
 | `UNSUPPORTED_MEDIA_TYPE` | 415 | 지원하지 않는 본문 형식 |
 | `INTERNAL_SERVER_ERROR` | 500 | 서버 내부 처리 오류 |
 | `PROFANITY_CHECK_UNAVAILABLE` | 503 | 비속어 검사 API 오류·시간 초과·응답 해석 실패 |
@@ -195,3 +196,50 @@
 
 - 상품이 없으면 `PRODUCT_NOT_FOUND`를 반환한다.
 - 경로의 상품 ID가 정수가 아니면 `INVALID_REQUEST`를 반환한다.
+
+## 3. 위시리스트
+
+회원은 인증 토큰으로 식별한다. 요청에서 회원 ID를 지정하지 않는다.
+
+### 위시리스트 상품 추가
+
+- `POST /api/wishes`
+
+#### 요청
+
+```json
+{ "productId": 1 }
+```
+
+| 필드 | 타입 | 필수 | 설명 |
+|---|---|---|---|
+| `productId` | 정수 | O | 추가할 상품 ID |
+
+#### 성공 응답
+
+- 상태: `201 Created`
+
+```json
+{
+  "id": 1,
+  "product": {
+    "id": 1,
+    "name": "머그컵",
+    "price": 12000,
+    "imageUrl": "https://example.com/mug.png"
+  }
+}
+```
+
+`id`는 상품 ID가 아닌 위시리스트 항목 ID다.
+
+#### 실패 응답
+
+- 입력 검증 실패 시 `INVALID_REQUEST`를 반환한다.
+- 인증 실패 시 `INVALID_TOKEN`을 반환한다.
+- 상품이 없으면 `PRODUCT_NOT_FOUND`를 반환한다.
+- 본인의 목록에 이미 등록된 상품이면 `WISH_ALREADY_EXISTS`를 반환한다.
+
+### 원본 상품 삭제
+
+상품 삭제 시 해당 상품을 담은 모든 회원의 위시리스트 항목을 함께 삭제한다. 상품과 관련 항목의 삭제는 같은 트랜잭션에서 처리한다.

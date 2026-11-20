@@ -6,6 +6,7 @@ public enum ErrorCode {
     PROFANITY_CHECK_UNAVAILABLE("비속어 검사를 수행할 수 없습니다."),
     PROFANITY_DETECTED("상품 이름에 비속어를 사용할 수 없습니다."),
     PRODUCT_NOT_FOUND("상품을 찾을 수 없습니다."),
+    WISH_ALREADY_EXISTS("이미 위시리스트에 등록된 상품입니다."),
     INVALID_REQUEST("요청 값이 올바르지 않습니다."),
     ROUTE_NOT_FOUND("요청 경로를 찾을 수 없습니다."),
     METHOD_NOT_ALLOWED("지원하지 않는 HTTP 메서드입니다."),
