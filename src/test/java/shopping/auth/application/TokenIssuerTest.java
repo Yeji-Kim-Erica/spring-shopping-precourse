@@ -17,9 +17,9 @@ import shopping.auth.persistence.TokenRepository;
 @DisplayName("인증 토큰 발급")
 class TokenIssuerTest {
 
-    @DisplayName("생성한 토큰에 회원과 현재 발급 시각을 연결해 저장한다")
+    @DisplayName("생성한 토큰을 요청한 회원에 연결해 저장한다")
     @Test
-    void persistsGeneratedTokenUsingCurrentTime() {
+    void persistsGeneratedTokenForRequestedMember() {
         TokenRepository repository = mock(TokenRepository.class);
         Clock clock = Clock.fixed(Instant.EPOCH, ZoneOffset.UTC);
         when(repository.save(any(AccessToken.class))).thenAnswer(call -> call.getArgument(0));
@@ -29,7 +29,6 @@ class TokenIssuerTest {
 
         verify(repository).save(issued);
         assertThat(issued.value()).isEqualTo("generated");
-        assertThat(issued.isExpired(Instant.EPOCH.plusSeconds(3599))).isFalse();
-        assertThat(issued.isExpired(Instant.EPOCH.plusSeconds(3600))).isTrue();
+        assertThat(issued.authenticateAt(clock.instant())).isEqualTo(7L);
     }
 }
