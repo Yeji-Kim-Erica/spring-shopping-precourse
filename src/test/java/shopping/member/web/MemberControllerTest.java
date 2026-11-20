@@ -12,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -117,9 +118,12 @@ class MemberControllerTest {
     }
 
     @DisplayName("이메일과 비밀번호 형식 오류는 입력 오류로 응답한다")
-    @Test
-    void malformedCredentialsAreInputError() throws Exception {
-        request("login", "bad", "hello123").andExpect(status().isBadRequest())
+    @ParameterizedTest
+    @CsvSource({"bad,hello123", "yeji@example.com,abcd"})
+    void malformedCredentialsAreInputError(String email, String password) throws Exception {
+        register(BODY).andExpect(status().isCreated());
+
+        request("login", email, password).andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("INVALID_REQUEST"));
     }
 
