@@ -28,7 +28,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import shopping.common.error.ErrorCode;
 import shopping.common.error.ShoppingException;
 import shopping.product.domain.Product;
-import shopping.product.domain.ProductDetails;
 import shopping.product.domain.ProfanityChecker;
 import shopping.product.persistence.ProductRepository;
 
@@ -107,7 +106,7 @@ class ProductControllerTest {
     @Test
     void readsProductWithoutAuthentication() throws Exception {
         Product saved = products.saveAndFlush(
-                new Product(new ProductDetails("상품", 1000, "https://example.com/a")));
+                new Product("상품", 1000, "https://example.com/a"));
 
         mvc.perform(get("/api/products/{id}", saved.id())).andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(saved.id()))
@@ -257,11 +256,11 @@ class ProductControllerTest {
     }
 
     private Product product(String name) {
-        return new Product(new ProductDetails(name, 1000, "https://example.com/a"));
+        return new Product(name, 1000, "https://example.com/a");
     }
 
     private Long saveOriginalProduct() {
         return products.saveAndFlush(
-                new Product(new ProductDetails("기존", 1000, "https://a.com"))).id();
+                new Product("기존", 1000, "https://a.com")).id();
     }
 }

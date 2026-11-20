@@ -18,7 +18,6 @@ import shopping.member.domain.Member;
 import shopping.member.domain.Password;
 import shopping.member.persistence.MemberRepository;
 import shopping.product.domain.Product;
-import shopping.product.domain.ProductDetails;
 import shopping.product.persistence.ProductRepository;
 import shopping.wish.domain.Wish;
 
@@ -106,6 +105,6 @@ class WishRepositoryTest {
     }
 
     private Product product(String name) {
-        return new Product(new ProductDetails(name, 1000, "https://example.com/a"));
+        return new Product(name, 1000, "https://example.com/a");
     }
 }

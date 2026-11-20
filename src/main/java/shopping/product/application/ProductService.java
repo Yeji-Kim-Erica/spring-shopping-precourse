@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import shopping.common.error.ErrorCode;
 import shopping.common.error.ShoppingException;
 import shopping.product.domain.Product;
-import shopping.product.domain.ProductDetails;
 import shopping.product.domain.ProfanityChecker;
 import shopping.product.persistence.ProductRepository;
 
@@ -24,9 +23,11 @@ public class ProductService {
     }
 
     @Transactional
-    public Product create(ProductDetails details) {
-        details.checkProfanity(checker);
-        return products.save(new Product(details));
+    public Product create(String name, Integer price, String imageUrl) {
+        Product product = new Product(name, price, imageUrl);
+        product.checkProfanity(checker);
+
+        return products.save(product);
     }
 
     public List<Product> list() {
@@ -39,11 +40,10 @@ public class ProductService {
     }
 
     @Transactional
-    public Product update(Long id, ProductDetails details) {
+    public Product update(Long id, String name, Integer price, String imageUrl) {
         Product product = find(id);
-        details.checkProfanity(checker);
+        product.changeTo(name, price, imageUrl, checker);
 
-        product.changeTo(details);
         return product;
     }
 

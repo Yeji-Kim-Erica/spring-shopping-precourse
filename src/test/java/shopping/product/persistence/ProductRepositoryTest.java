@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import shopping.product.domain.Product;
-import shopping.product.domain.ProductDetails;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -27,7 +26,7 @@ class ProductRepositoryTest {
     @Test
     void assignsIdAndRestoresAllProductDetails() {
         Product saved = products.saveAndFlush(
-                new Product(new ProductDetails("상품", 1000, "https://example.com/a")));
+                new Product("상품", 1000, "https://example.com/a"));
         entityManager.clear();
 
         Product found = products.findById(saved.id()).orElseThrow();

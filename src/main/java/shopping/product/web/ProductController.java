@@ -26,7 +26,8 @@ public class ProductController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ProductResponse create(@RequestBody ProductRequest request) {
-        return ProductResponse.of(products.create(request.details()));
+        return ProductResponse.of(
+                products.create(request.name(), request.price(), request.imageUrl()));
     }
 
     @GetMapping
@@ -42,7 +43,8 @@ public class ProductController {
     @PutMapping("/{productId}")
     public ProductResponse update(@PathVariable Long productId,
             @RequestBody ProductRequest request) {
-        return ProductResponse.of(products.update(productId, request.details()));
+        return ProductResponse.of(
+                products.update(productId, request.name(), request.price(), request.imageUrl()));
     }
 
     @DeleteMapping("/{productId}")

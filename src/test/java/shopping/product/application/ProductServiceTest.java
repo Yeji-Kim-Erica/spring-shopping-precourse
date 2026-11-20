@@ -17,7 +17,6 @@ import org.springframework.data.domain.Sort;
 import shopping.common.error.ErrorCode;
 import shopping.common.error.ShoppingException;
 import shopping.product.domain.Product;
-import shopping.product.domain.ProductDetails;
 import shopping.product.domain.ProfanityChecker;
 import shopping.product.persistence.ProductRepository;
 
@@ -27,9 +26,7 @@ class ProductServiceTest {
     private final ProductRepository products = mock(ProductRepository.class);
     private final ProfanityChecker checker = mock(ProfanityChecker.class);
     private final ProductService service = new ProductService(products, checker);
-    private final ProductDetails details = new ProductDetails("상품", 1000, "https://example.com/a");
-    private final Product product = new Product(new ProductDetails("기존", 1000, "https://a.com"));
-    private final ProductDetails updated = new ProductDetails("수정", 2000, "https://b.com");
+    private final Product product = mock(Product.class);
 
     @DisplayName("상품 이름의 비속어 검사를 통과하면 저장된 상품을 반환한다")
     @Test
@@ -37,7 +34,7 @@ class ProductServiceTest {
         Product saved = mock(Product.class);
         when(products.save(any(Product.class))).thenReturn(saved);
 
-        assertThat(service.create(details)).isSameAs(saved);
+        assertThat(service.create("상품", 1000, "https://example.com/a")).isSameAs(saved);
         verify(checker).containsProfanity("상품");
     }
 
@@ -46,7 +43,8 @@ class ProductServiceTest {
     void profanityRejectionDoesNotSave() {
         when(checker.containsProfanity("상품")).thenReturn(true);
 
-        assertThatThrownBy(() -> service.create(details)).isInstanceOf(ShoppingException.class);
+        assertThatThrownBy(() -> service.create("상품", 1000, "https://example.com/a"))
+                .isInstanceOf(ShoppingException.class);
         verifyNoInteractions(products);
     }
 
@@ -56,7 +54,8 @@ class ProductServiceTest {
         ShoppingException failure = new ShoppingException(ErrorCode.PROFANITY_CHECK_UNAVAILABLE);
         when(checker.containsProfanity("상품")).thenThrow(failure);
 
-        assertThatThrownBy(() -> service.create(details)).isSameAs(failure);
+        assertThatThrownBy(() -> service.create("상품", 1000, "https://example.com/a"))
+                .isSameAs(failure);
         verifyNoInteractions(products);
     }
 
@@ -89,13 +88,13 @@ class ProductServiceTest {
                         error -> assertThat(error.code()).isEqualTo(ErrorCode.PRODUCT_NOT_FOUND));
     }
 
-    @DisplayName("검증을 통과하면 조회한 상품의 정보를 변경한다")
+    @DisplayName("조회한 상품에 검증과 수정을 맡기고 해당 상품을 반환한다")
     @Test
-    void changesLoadedProductAfterValidation() {
+    void delegatesChangesToLoadedProduct() {
         when(products.findById(7L)).thenReturn(Optional.of(product));
 
-        assertThat(service.update(7L, updated)).isSameAs(product);
-        assertThat(product.name()).isEqualTo("수정");
+        assertThat(service.update(7L, "수정", 2000, "https://b.com")).isSameAs(product);
+        verify(product).changeTo("수정", 2000, "https://b.com", checker);
     }
 
     @DisplayName("수정할 상품이 없으면 비속어 검사를 호출하지 않는다")
@@ -105,27 +104,6 @@ class ProductServiceTest {
 
         assertFailure(ErrorCode.PRODUCT_NOT_FOUND);
         verifyNoInteractions(checker);
-    }
-
-    @DisplayName("수정할 이름에 비속어가 있으면 기존 상품 정보를 유지한다")
-    @Test
-    void profanityLeavesOriginalDetailsUntouched() {
-        when(products.findById(7L)).thenReturn(Optional.of(product));
-        when(checker.containsProfanity("수정")).thenReturn(true);
-
-        assertFailure(ErrorCode.PROFANITY_DETECTED);
-        assertUnchanged();
-    }
-
-    @DisplayName("수정 시 비속어 검사에 실패하면 기존 상품 정보를 유지한다")
-    @Test
-    void unavailableCheckLeavesOriginalDetailsUntouched() {
-        when(products.findById(7L)).thenReturn(Optional.of(product));
-        when(checker.containsProfanity("수정"))
-                .thenThrow(new ShoppingException(ErrorCode.PROFANITY_CHECK_UNAVAILABLE));
-
-        assertFailure(ErrorCode.PROFANITY_CHECK_UNAVAILABLE);
-        assertUnchanged();
     }
 
     @DisplayName("삭제 요청한 상품을 조회해 삭제한다")
@@ -151,14 +129,8 @@ class ProductServiceTest {
     }
 
     private void assertFailure(ErrorCode expected) {
-        assertThatThrownBy(() -> service.update(7L, updated))
+        assertThatThrownBy(() -> service.update(7L, "수정", 2000, "https://b.com"))
                 .isInstanceOfSatisfying(ShoppingException.class,
                         error -> assertThat(error.code()).isEqualTo(expected));
-    }
-
-    private void assertUnchanged() {
-        assertThat(product.name()).isEqualTo("기존");
-        assertThat(product.price()).isEqualTo(1000);
-        assertThat(product.imageUrl()).isEqualTo("https://a.com");
     }
 }

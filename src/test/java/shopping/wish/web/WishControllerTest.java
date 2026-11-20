@@ -27,7 +27,6 @@ import shopping.member.application.MemberService;
 import shopping.member.domain.Email;
 import shopping.member.persistence.MemberRepository;
 import shopping.product.domain.Product;
-import shopping.product.domain.ProductDetails;
 import shopping.product.persistence.ProductRepository;
 import shopping.wish.domain.Wish;
 import shopping.wish.persistence.WishRepository;
@@ -63,8 +62,7 @@ class WishControllerTest {
         other = register("wish-other@example.com");
         ownerId = memberId("wish-owner@example.com");
         otherId = memberId("wish-other@example.com");
-        product = products.saveAndFlush(new Product(
-                new ProductDetails("상품", 1000, "https://example.com/a")));
+        product = products.saveAndFlush(new Product("상품", 1000, "https://example.com/a"));
     }
 
     @DisplayName("인증된 회원의 위시에 상품을 추가한다")
@@ -132,7 +130,7 @@ class WishControllerTest {
         Wish first = wishes.saveAndFlush(new Wish(ownerId, product));
         wishes.saveAndFlush(new Wish(otherId, product));
         Product next = products.saveAndFlush(
-                new Product(new ProductDetails("다음상품", 2000, "https://example.com/b")));
+                new Product("다음상품", 2000, "https://example.com/b"));
         Wish second = wishes.saveAndFlush(new Wish(ownerId, next));
 
         mvc.perform(get("/api/wishes").header("Authorization", owner)).andExpect(status().isOk())
@@ -154,7 +152,7 @@ class WishControllerTest {
     @Test
     void returnsCurrentProductDetails() throws Exception {
         wishes.saveAndFlush(new Wish(ownerId, product));
-        product.changeTo(new ProductDetails("현재상품", 2000, "https://example.com/new"));
+        product.changeTo("현재상품", 2000, "https://example.com/new", text -> false);
         products.saveAndFlush(product);
 
         mvc.perform(get("/api/wishes").header("Authorization", owner)).andExpect(status().isOk())
@@ -184,7 +182,7 @@ class WishControllerTest {
         Wish target = wishes.saveAndFlush(new Wish(ownerId, product));
         Wish others = wishes.saveAndFlush(new Wish(otherId, product));
         Product next = products.saveAndFlush(
-                new Product(new ProductDetails("다음상품", 2000, "https://example.com/b")));
+                new Product("다음상품", 2000, "https://example.com/b"));
         Wish retained = wishes.saveAndFlush(new Wish(ownerId, next));
 
         mvc.perform(delete("/api/wishes/{id}", target.id()).header("Authorization", owner))
