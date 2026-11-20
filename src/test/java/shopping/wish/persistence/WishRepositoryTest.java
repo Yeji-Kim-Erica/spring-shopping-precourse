@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import jakarta.persistence.EntityManager;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,6 +44,22 @@ class WishRepositoryTest {
         owner = member("repo-owner@example.com").id();
         other = member("repo-other@example.com").id();
         product = products.saveAndFlush(product("상품"));
+    }
+
+    @Test
+    void filtersByMemberAndLoadsOrderedProductsOutsidePersistenceContext() {
+        Wish first = wishes.saveAndFlush(new Wish(owner, product));
+        wishes.saveAndFlush(new Wish(other, product));
+        Product next = products.saveAndFlush(product("다음상품"));
+        Wish second = wishes.saveAndFlush(new Wish(owner, next));
+        entityManager.clear();
+
+        List<Wish> found = wishes.findAllWithProducts(owner);
+        entityManager.clear();
+
+        assertThat(found).extracting(Wish::id).containsExactly(first.id(), second.id());
+        assertThat(found).extracting(wish -> wish.product().name())
+                .containsExactly("상품", "다음상품");
     }
 
     @Test
