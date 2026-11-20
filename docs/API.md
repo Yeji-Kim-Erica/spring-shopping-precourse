@@ -169,3 +169,18 @@
 
 - 상품이 없으면 `PRODUCT_NOT_FOUND`를 반환한다.
 - 경로의 상품 ID가 정수가 아니면 `INVALID_REQUEST`를 반환한다.
+
+### 상품 수정
+
+- `PUT /api/products/{productId}`
+- 토큰 인증 불필요
+- 요청: 상품 추가와 동일한 전체 필드와 검증 조건을 사용한다.
+- 성공: `200 OK`, 수정된 상품을 상품 추가의 성공 응답과 같은 형식으로 반환한다.
+
+#### 실패 응답
+
+- 입력 검증 실패 시 `INVALID_REQUEST`를 반환한다.
+- 상품이 없으면 `PRODUCT_NOT_FOUND`를 반환한다.
+- 비속어 포함 시 `PROFANITY_DETECTED`를 반환한다.
+- 비속어 검사 실패 시 `PROFANITY_CHECK_UNAVAILABLE`을 반환한다.
+- 실패한 요청은 기존 상품 정보를 변경하지 않는다.

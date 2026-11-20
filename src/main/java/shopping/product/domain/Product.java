@@ -27,6 +27,14 @@ public class Product {
     }
 
     public Product(ProductDetails details) {
+        apply(details);
+    }
+
+    public void changeTo(ProductDetails details) {
+        apply(details);
+    }
+
+    private void apply(ProductDetails details) {
         this.name = details.name();
         this.price = details.price();
         this.imageUrl = details.imageUrl();
