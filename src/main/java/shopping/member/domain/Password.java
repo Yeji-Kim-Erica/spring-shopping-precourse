@@ -26,6 +26,10 @@ public class Password {
         this.value = value;
     }
 
+    public boolean matches(Password candidate) {
+        return value.equals(candidate.value);
+    }
+
     private static boolean isSpace(int character) {
         return Character.isWhitespace(character) || Character.isSpaceChar(character);
     }

@@ -1,6 +1,7 @@
 package shopping.common.error;
 
 public enum ErrorCode {
+    INVALID_CREDENTIALS("이메일 또는 비밀번호가 올바르지 않습니다."),
     INVALID_TOKEN("유효한 인증 토큰이 필요합니다."),
     INVALID_REQUEST("요청 값이 올바르지 않습니다."),
     ROUTE_NOT_FOUND("요청 경로를 찾을 수 없습니다."),

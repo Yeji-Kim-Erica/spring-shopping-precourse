@@ -1,8 +1,10 @@
 package shopping.member.persistence;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,6 +22,20 @@ class MemberRepositoryTest {
 
     @Autowired
     private MemberRepository members;
+    @Autowired
+    private EntityManager entityManager;
+
+    @Test
+    void retrievesStoredCredentialsForAuthentication() {
+        Member saved = members.saveAndFlush(member("yeji@example.com"));
+        entityManager.clear();
+
+        Member found = members.findByEmail(new Email("yeji@example.com")).orElseThrow();
+
+        assertThat(found.id()).isEqualTo(saved.id());
+        assertThatCode(
+                () -> found.authenticate(new Password("hello123"))).doesNotThrowAnyException();
+    }
 
     @Test
     void assignsIdAndFindsNormalizedEmailCaseSensitively() {

@@ -6,6 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import shopping.common.error.ErrorCode;
+import shopping.common.error.ShoppingException;
 
 @Entity
 @Table(name = "members")
@@ -29,6 +31,12 @@ public class Member {
 
         this.email = email;
         this.password = password;
+    }
+
+    public void authenticate(Password candidate) {
+        if (!password.matches(candidate)) {
+            throw new ShoppingException(ErrorCode.INVALID_CREDENTIALS);
+        }
     }
 
     public Long id() {
