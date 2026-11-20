@@ -1,5 +1,7 @@
 package shopping.product.application;
 
+import java.util.List;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shopping.common.error.ErrorCode;
@@ -10,23 +12,44 @@ import shopping.product.domain.ProfanityChecker;
 import shopping.product.persistence.ProductRepository;
 
 @Service
-public class ProductUpdateService {
+@Transactional(readOnly = true)
+public class ProductService {
 
     private final ProductRepository products;
     private final ProfanityChecker checker;
 
-    public ProductUpdateService(ProductRepository products, ProfanityChecker checker) {
+    public ProductService(ProductRepository products, ProfanityChecker checker) {
         this.products = products;
         this.checker = checker;
     }
 
     @Transactional
-    public Product update(Long id, ProductDetails details) {
-        Product product = products.findById(id)
+    public Product create(ProductDetails details) {
+        details.checkProfanity(checker);
+        return products.save(new Product(details));
+    }
+
+    public List<Product> list() {
+        return products.findAll(Sort.by("id"));
+    }
+
+    public Product find(Long id) {
+        return products.findById(id)
                 .orElseThrow(() -> new ShoppingException(ErrorCode.PRODUCT_NOT_FOUND));
+    }
+
+    @Transactional
+    public Product update(Long id, ProductDetails details) {
+        Product product = find(id);
         details.checkProfanity(checker);
 
         product.changeTo(details);
         return product;
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        Product product = find(id);
+        products.delete(product);
     }
 }
