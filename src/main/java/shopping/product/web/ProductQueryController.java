@@ -1,5 +1,6 @@
 package shopping.product.web;
 
+import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +13,11 @@ public class ProductQueryController {
 
     public ProductQueryController(ProductQueryService query) {
         this.query = query;
+    }
+
+    @GetMapping("/api/products")
+    public List<ProductResponse> list() {
+        return query.list().stream().map(ProductResponse::of).toList();
     }
 
     @GetMapping("/api/products/{productId}")

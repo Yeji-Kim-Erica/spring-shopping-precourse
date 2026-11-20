@@ -5,8 +5,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.domain.Sort;
 import shopping.common.error.ErrorCode;
 import shopping.common.error.ShoppingException;
 import shopping.product.domain.Product;
@@ -16,6 +18,15 @@ class ProductQueryServiceTest {
 
     private final ProductRepository products = mock(ProductRepository.class);
     private final ProductQueryService service = new ProductQueryService(products);
+
+    @Test
+    void requestsIdOrderingFromStorage() {
+        Product first = mock(Product.class);
+        Product second = mock(Product.class);
+        when(products.findAll(Sort.by("id"))).thenReturn(List.of(first, second));
+
+        assertThat(service.list()).containsExactly(first, second);
+    }
 
     @Test
     void returnsRequestedProduct() {

@@ -153,6 +153,12 @@
 - 비속어 포함 시 `PROFANITY_DETECTED`를 반환한다.
 - 비속어 검사 실패 시 `PROFANITY_CHECK_UNAVAILABLE`을 반환하고 상품을 저장하지 않는다.
 
+### 상품 목록 조회
+
+- `GET /api/products`
+- 토큰 인증 불필요
+- 성공: `200 OK`, 상품 응답 객체의 배열을 ID 오름차순으로 반환한다. 상품이 없으면 `[]`를 반환한다.
+
 ### 상품 조회
 
 - `GET /api/products/{productId}`
