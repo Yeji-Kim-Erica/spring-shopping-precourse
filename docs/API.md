@@ -27,6 +27,7 @@
 | `PROFANITY_DETECTED` | 400 | 상품 이름에 비속어 포함 |
 | `INVALID_CREDENTIALS` | 401 | 이메일 또는 비밀번호 불일치 |
 | `INVALID_TOKEN` | 401 | 토큰 누락·형식 오류·미등록·만료 |
+| `PRODUCT_NOT_FOUND` | 404 | 존재하지 않는 상품 |
 | `ROUTE_NOT_FOUND` | 404 | 요청 경로에 해당하는 엔드포인트나 정적 리소스 없음 |
 | `METHOD_NOT_ALLOWED` | 405 | 지원하지 않는 HTTP 메서드 |
 | `NOT_ACCEPTABLE` | 406 | 지원하지 않는 응답 형식 |
@@ -151,3 +152,14 @@
 - 입력 검증 실패 시 `INVALID_REQUEST`를 반환한다.
 - 비속어 포함 시 `PROFANITY_DETECTED`를 반환한다.
 - 비속어 검사 실패 시 `PROFANITY_CHECK_UNAVAILABLE`을 반환하고 상품을 저장하지 않는다.
+
+### 상품 조회
+
+- `GET /api/products/{productId}`
+- 토큰 인증 불필요
+- 성공: `200 OK`, 상품 추가의 성공 응답과 같은 형식이다.
+
+#### 실패 응답
+
+- 상품이 없으면 `PRODUCT_NOT_FOUND`를 반환한다.
+- 경로의 상품 ID가 정수가 아니면 `INVALID_REQUEST`를 반환한다.
