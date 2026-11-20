@@ -1,5 +1,6 @@
 package shopping.wish.application;
 
+import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shopping.common.error.ErrorCode;
@@ -10,12 +11,13 @@ import shopping.wish.domain.Wish;
 import shopping.wish.persistence.WishRepository;
 
 @Service
-public class WishAdditionService {
+@Transactional(readOnly = true)
+public class WishService {
 
     private final WishRepository wishes;
     private final ProductRepository products;
 
-    public WishAdditionService(WishRepository wishes, ProductRepository products) {
+    public WishService(WishRepository wishes, ProductRepository products) {
         this.wishes = wishes;
         this.products = products;
     }
@@ -27,6 +29,19 @@ public class WishAdditionService {
         rejectDuplicate(memberId, productId);
 
         return wishes.saveAndFlush(new Wish(memberId, product));
+    }
+
+    public List<Wish> list(Long memberId) {
+        return wishes.findAllWithProducts(memberId);
+    }
+
+    @Transactional
+    public void delete(Long memberId, Long wishId) {
+        Wish wish = wishes.findById(wishId)
+                .orElseThrow(() -> new ShoppingException(ErrorCode.WISH_NOT_FOUND));
+        wish.requireOwner(memberId);
+
+        wishes.delete(wish);
     }
 
     private void rejectDuplicate(Long memberId, Long productId) {
