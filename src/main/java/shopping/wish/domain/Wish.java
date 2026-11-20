@@ -9,6 +9,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import shopping.common.error.ErrorCode;
+import shopping.common.error.ShoppingException;
 import shopping.product.domain.Product;
 
 @Entity
@@ -34,6 +36,12 @@ public class Wish {
 
         this.memberId = memberId;
         this.product = product;
+    }
+
+    public void requireOwner(Long requesterId) {
+        if (!memberId.equals(requesterId)) {
+            throw new ShoppingException(ErrorCode.FORBIDDEN);
+        }
     }
 
     public Long id() {

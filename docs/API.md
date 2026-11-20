@@ -27,8 +27,10 @@
 | `PROFANITY_DETECTED` | 400 | 상품 이름에 비속어 포함 |
 | `INVALID_CREDENTIALS` | 401 | 이메일 또는 비밀번호 불일치 |
 | `INVALID_TOKEN` | 401 | 토큰 누락·형식 오류·미등록·만료 |
+| `FORBIDDEN` | 403 | 다른 회원의 위시리스트 항목 접근 |
 | `PRODUCT_NOT_FOUND` | 404 | 존재하지 않는 상품 |
 | `ROUTE_NOT_FOUND` | 404 | 요청 경로에 해당하는 엔드포인트나 정적 리소스 없음 |
+| `WISH_NOT_FOUND` | 404 | 존재하지 않는 위시리스트 항목 |
 | `METHOD_NOT_ALLOWED` | 405 | 지원하지 않는 HTTP 메서드 |
 | `NOT_ACCEPTABLE` | 406 | 지원하지 않는 응답 형식 |
 | `EMAIL_ALREADY_EXISTS` | 409 | 이미 가입된 이메일 |
@@ -252,6 +254,18 @@
 
 - 인증 실패 시 `INVALID_TOKEN`을 반환한다.
 - 회원 ID 등 정의하지 않은 쿼리 파라미터를 전달하면 `INVALID_REQUEST`를 반환한다.
+
+### 위시리스트 상품 삭제
+
+- `DELETE /api/wishes/{wishId}`
+- 성공: `204 No Content`, 응답 본문 없음.
+
+#### 실패 응답
+
+- 인증 실패 시 `INVALID_TOKEN`을 반환한다.
+- 항목이 없으면 `WISH_NOT_FOUND`를 반환한다.
+- 다른 회원의 항목이면 `FORBIDDEN`을 반환한다.
+- 경로의 항목 ID가 정수가 아니면 `INVALID_REQUEST`를 반환한다.
 
 ### 원본 상품 삭제
 
