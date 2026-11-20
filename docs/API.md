@@ -206,6 +206,7 @@
 ### 위시리스트 상품 추가
 
 - `POST /api/wishes`
+- 쿼리 파라미터 없음.
 
 #### 요청
 
@@ -241,6 +242,7 @@
 - 인증 실패 시 `INVALID_TOKEN`을 반환한다.
 - 상품이 없으면 `PRODUCT_NOT_FOUND`를 반환한다.
 - 본인의 목록에 이미 등록된 상품이면 `WISH_ALREADY_EXISTS`를 반환한다.
+- 회원 ID 등 정의하지 않은 쿼리 파라미터를 전달하면 `INVALID_REQUEST`를 반환한다.
 
 ### 위시리스트 상품 목록 조회
 

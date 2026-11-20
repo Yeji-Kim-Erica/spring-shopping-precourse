@@ -100,6 +100,18 @@ class WishControllerTest {
                 .andExpect(jsonPath("$.code").value("INVALID_REQUEST"));
     }
 
+    @DisplayName("위시 추가 시 쿼리로 회원을 지정하면 거절하고 저장하지 않는다")
+    @Test
+    void rejectsMemberSelectionWhenAddingWish() throws Exception {
+        mvc.perform(post("/api/wishes").queryParam("memberId", otherId.toString())
+                .header("Authorization", owner).contentType("application/json")
+                .content("{\"productId\":" + product.id() + "}"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_REQUEST"));
+
+        assertThat(wishes.count()).isZero();
+    }
+
     @DisplayName("위시 추가에는 유효한 인증 토큰이 필요하다")
     @ParameterizedTest
     @NullSource

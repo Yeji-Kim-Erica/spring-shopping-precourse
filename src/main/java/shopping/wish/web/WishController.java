@@ -32,8 +32,14 @@ public class WishController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public WishResponse add(@RequestHeader(value = "Authorization", required = false) String header,
-            @Valid @RequestBody WishRequest request) {
+            @Valid @RequestBody WishRequest request,
+            @RequestParam Map<String, String> parameters) {
         Long memberId = members.resolve(header);
+
+        if (!parameters.isEmpty()) {
+            throw new IllegalArgumentException("위시 추가에는 쿼리 파라미터를 사용하지 않습니다.");
+        }
+
         return WishResponse.of(wishes.add(memberId, request.productId()));
     }
 
