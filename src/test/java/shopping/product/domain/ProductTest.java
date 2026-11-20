@@ -49,7 +49,14 @@ class ProductTest {
         assertThatIllegalArgumentException().isThrownBy(() -> product("상품", price));
     }
 
-    @DisplayName("이미지 URL은 호스트가 있는 HTTP 또는 HTTPS 형식이어야 한다")
+    @DisplayName("호스트가 있는 HTTP와 HTTPS 이미지 URL을 허용한다")
+    @ParameterizedTest
+    @ValueSource(strings = {"http://example.com/image.png", "https://example.com/image.png"})
+    void acceptsHttpAndHttpsImageUrls(String url) {
+        assertThatCode(() -> new Product("상품", 1, url)).doesNotThrowAnyException();
+    }
+
+    @DisplayName("누락되거나 호스트와 프로토콜이 올바르지 않은 이미지 URL은 거절한다")
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {"image.png", "http://", "ftp://example.com/a"})
