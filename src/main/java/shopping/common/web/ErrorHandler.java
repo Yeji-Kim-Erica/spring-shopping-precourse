@@ -1,0 +1,63 @@
+package shopping.common.web;
+
+import java.util.Locale;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+import shopping.common.error.ErrorCode;
+import shopping.common.error.ShoppingException;
+
+@RestControllerAdvice
+public class ErrorHandler extends ResponseEntityExceptionHandler {
+
+    private static final Logger LOG = LoggerFactory.getLogger(ErrorHandler.class);
+
+    @ExceptionHandler(ShoppingException.class)
+    public ResponseEntity<Object> handleShopping(ShoppingException error) {
+        return respond(error.code());
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Object> handleValidation(IllegalArgumentException error) {
+        return respond(ErrorCode.INVALID_REQUEST);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<Object> handleConstraint(DataIntegrityViolationException error) {
+        String message = String.valueOf(error.getMostSpecificCause().getMessage());
+        if (message.toLowerCase(Locale.ROOT).contains("uq_members_email")) {
+            return respond(ErrorCode.EMAIL_ALREADY_EXISTS);
+        }
+
+        return handleUnexpected(error);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Object> handleUnexpected(Exception error) {
+        LOG.error("Request failed: {}", error.getClass().getSimpleName());
+        return respond(ErrorCode.INTERNAL_SERVER_ERROR);
+    }
+
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(Exception error, Object body,
+            HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.putAll(headers);
+        responseHeaders.setContentType(MediaType.APPLICATION_JSON);
+        return new ResponseEntity<>(ErrorResponse.of(ErrorStatus.from(status.value())),
+                responseHeaders, status);
+    }
+
+    private ResponseEntity<Object> respond(ErrorCode code) {
+        return ResponseEntity.status(ErrorStatus.of(code))
+                .contentType(MediaType.APPLICATION_JSON).body(ErrorResponse.of(code));
+    }
+}
