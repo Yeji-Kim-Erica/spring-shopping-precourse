@@ -7,6 +7,8 @@ import shopping.common.error.ErrorCode;
 final class ErrorStatus {
 
     private static final Map<ErrorCode, HttpStatus> STATUSES = Map.ofEntries(
+            Map.entry(ErrorCode.PROFANITY_DETECTED, HttpStatus.BAD_REQUEST),
+            Map.entry(ErrorCode.PROFANITY_CHECK_UNAVAILABLE, HttpStatus.SERVICE_UNAVAILABLE),
             Map.entry(ErrorCode.INVALID_CREDENTIALS, HttpStatus.UNAUTHORIZED),
             Map.entry(ErrorCode.INVALID_TOKEN, HttpStatus.UNAUTHORIZED),
             Map.entry(ErrorCode.INVALID_REQUEST, HttpStatus.BAD_REQUEST),

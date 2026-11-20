@@ -24,6 +24,7 @@
 | code | 상태 | 의미 |
 |---|---|---|
 | `INVALID_REQUEST` | 400 | 본문·파라미터·헤더 형식 오류, 필드 검증 실패 전반 |
+| `PROFANITY_DETECTED` | 400 | 상품 이름에 비속어 포함 |
 | `INVALID_CREDENTIALS` | 401 | 이메일 또는 비밀번호 불일치 |
 | `INVALID_TOKEN` | 401 | 토큰 누락·형식 오류·미등록·만료 |
 | `ROUTE_NOT_FOUND` | 404 | 요청 경로에 해당하는 엔드포인트나 정적 리소스 없음 |
@@ -32,6 +33,7 @@
 | `EMAIL_ALREADY_EXISTS` | 409 | 이미 가입된 이메일 |
 | `UNSUPPORTED_MEDIA_TYPE` | 415 | 지원하지 않는 본문 형식 |
 | `INTERNAL_SERVER_ERROR` | 500 | 서버 내부 처리 오류 |
+| `PROFANITY_CHECK_UNAVAILABLE` | 503 | 비속어 검사 API 오류·시간 초과·응답 해석 실패 |
 
 ## 1. 회원
 
@@ -107,3 +109,45 @@
 - 토큰은 발급부터 1시간 동안 유효하며, 만료 시각부터 인증에 실패한다.
 - 토큰 누락·형식 오류·미등록·만료 시 `INVALID_TOKEN`을 반환한다.
 - `401` 응답에는 `WWW-Authenticate: Bearer` 헤더를 포함한다.
+
+## 2. 상품
+
+### 상품 추가
+
+- `POST /api/products`
+- 토큰 인증 불필요
+
+#### 요청
+
+```json
+{
+  "name": "머그컵",
+  "price": 12000,
+  "imageUrl": "https://example.com/mug.png"
+}
+```
+
+| 필드 | 타입 | 필수 | 검증 조건 |
+|---|---|---|---|
+| `name` | 문자열 | O | 공백 포함 최대 15자, 빈 값 금지, 허용 특수 문자 `()[]+-&/_`, 비속어 금지 |
+| `price` | 정수 | O | 1~2,147,483,647 |
+| `imageUrl` | 문자열 | O | 호스트가 있는 http 또는 https URL |
+
+#### 성공 응답
+
+- 상태: `201 Created`
+
+```json
+{
+  "id": 1,
+  "name": "머그컵",
+  "price": 12000,
+  "imageUrl": "https://example.com/mug.png"
+}
+```
+
+#### 실패 응답
+
+- 입력 검증 실패 시 `INVALID_REQUEST`를 반환한다.
+- 비속어 포함 시 `PROFANITY_DETECTED`를 반환한다.
+- 비속어 검사 실패 시 `PROFANITY_CHECK_UNAVAILABLE`을 반환하고 상품을 저장하지 않는다.
