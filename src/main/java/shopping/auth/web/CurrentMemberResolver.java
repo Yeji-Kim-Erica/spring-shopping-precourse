@@ -4,11 +4,11 @@ import org.springframework.stereotype.Component;
 import shopping.auth.application.AuthenticationService;
 
 @Component
-public class CurrentMember {
+public class CurrentMemberResolver {
 
     private final AuthenticationService authentication;
 
-    public CurrentMember(AuthenticationService authentication) {
+    public CurrentMemberResolver(AuthenticationService authentication) {
         this.authentication = authentication;
     }
 
